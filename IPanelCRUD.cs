@@ -1,4 +1,3 @@
-﻿// Actividad 2.4 - Equipo #2
 //   SUÑIGA Maciel Joule Alexander
 //   VILLA Olivarez Ariel
 //   NUÑEZ Martinez Marco Antonio

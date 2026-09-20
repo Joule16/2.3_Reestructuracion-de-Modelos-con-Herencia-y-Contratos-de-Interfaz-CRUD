@@ -1,12 +1,12 @@
 # Sistema de Préstamo de Libros - Biblioteca
 
-## Actividad 2.2 - Vistas (MVC)
+## Actividad 2.3
 Equipo 2
 
 ## Integrantes
-//Suñiga Maciel Joule Alexander
-//Villa Olivarez Ariel
-//Nuñes Martinez Marco Antonio
+Suñiga Maciel Joule Alexander
+Villa Olivarez Ariel
+Nuñes Martinez Marco Antonio
 
 
 ## Descripción

@@ -11,19 +11,14 @@ namespace SistemaBiblioteca1.Models
 {
     public class Administrador : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Administrador> listaAdministradores = new List<Administrador>();
 
-        // ---------- Campos ----------
         private string nombre;
         private string apellido;
         private string usuarioAcceso;
         private string contrasena;
         private int nivelAcceso;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdAdministrador
         public int IdAdministrador
         {
             get { return Id; }
@@ -85,14 +80,12 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Administrador() : base()
         {
             nombre = string.Empty;
@@ -100,7 +93,7 @@ namespace SistemaBiblioteca1.Models
             usuarioAcceso = string.Empty;
             contrasena = string.Empty;
             nivelAcceso = 1;
-            EsActivo = false; // igual que antes: un administrador vacío nace inactivo
+            EsActivo = false;
         }
 
         public Administrador(int idAdministrador, string nombre, string apellido, string usuarioAcceso,
@@ -114,7 +107,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public bool TienePermiso()
         {
             return TienePermiso(3);
@@ -125,7 +117,6 @@ namespace SistemaBiblioteca1.Models
             return EsActivo && nivelAcceso >= nivelRequerido;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -143,7 +134,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaAdministradores.FirstOrDefault(a => a.Id == idBuscado); // null si no existe
+            return listaAdministradores.FirstOrDefault(a => a.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -172,7 +163,6 @@ namespace SistemaBiblioteca1.Models
             listaAdministradores.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -180,7 +170,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Administrador #{Id}: {nombre} {apellido} | Usuario: {usuarioAcceso} | " +

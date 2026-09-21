@@ -3,18 +3,18 @@
 //Nuñes Martinez Marco Antonio
 //Equipo 2
 //=============================
+using SistemaBiblioteca1.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Sancion : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Sancion> listaSanciones = new List<Sancion>();
 
-        // ---------- Campos ----------
         private int idUsuario;
         private int idPrestamo;
         private string motivo;
@@ -28,9 +28,6 @@ namespace SistemaBiblioteca1.Models
         private const double TARIFA_BASE_POR_DIA = 10.0;
         private const int DIAS_DESACTIVACION_DEFECTO = 15;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdSancion
         public int IdSancion
         {
             get { return Id; }
@@ -126,14 +123,12 @@ namespace SistemaBiblioteca1.Models
             set { pagada = value; }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Sancion() : base()
         {
             idUsuario = 0;
@@ -145,7 +140,7 @@ namespace SistemaBiblioteca1.Models
             fechaInicio = DateTime.Now;
             fechaFinDesactivacion = DateTime.Now.AddDays(DIAS_DESACTIVACION_DEFECTO);
             pagada = false;
-            EsActivo = false; // igual que antes: una sanción vacía nace inactiva
+            EsActivo = false;
         }
 
         public Sancion(int idSancion, int idUsuario, int idPrestamo, string motivo,
@@ -163,7 +158,6 @@ namespace SistemaBiblioteca1.Models
             Monto = CalcularMonto();
         }
 
-        // ---------- Lógica de negocio ----------
         public double CalcularMonto()
         {
             double resultado = CalcularMonto(TARIFA_BASE_POR_DIA);
@@ -189,7 +183,6 @@ namespace SistemaBiblioteca1.Models
             pagada = true;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -207,7 +200,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaSanciones.FirstOrDefault(s => s.Id == idBuscado); // null si no existe
+            return listaSanciones.FirstOrDefault(s => s.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -236,7 +229,6 @@ namespace SistemaBiblioteca1.Models
             listaSanciones.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -244,7 +236,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Sanción #{Id} | Usuario #{idUsuario} | Motivo: {motivo} | " +

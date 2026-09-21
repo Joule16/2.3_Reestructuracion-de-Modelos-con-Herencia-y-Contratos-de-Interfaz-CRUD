@@ -6,16 +6,15 @@
 using SistemaBiblioteca1.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Prestamo : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Prestamo> listaPrestamos = new List<Prestamo>();
 
-        // ---------- Campos ----------
         private int idUsuario;
         private int idEjemplar;
         private DateTime fechaPrestamo;
@@ -23,9 +22,6 @@ namespace SistemaBiblioteca1.Models
         private DateTime? fechaDevolucionReal;
         private bool devuelto;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdPrestamo
         public int IdPrestamo
         {
             get { return Id; }
@@ -94,14 +90,12 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Prestamo() : base()
         {
             idUsuario = 0;
@@ -110,7 +104,7 @@ namespace SistemaBiblioteca1.Models
             fechaLimite = DateTime.Now;
             fechaDevolucionReal = null;
             devuelto = false;
-            EsActivo = false; // igual que antes: un préstamo vacío nace inactivo
+            EsActivo = false;
         }
 
         public Prestamo(int idPrestamo, int idUsuario, int idEjemplar, DateTime fechaPrestamo,
@@ -125,7 +119,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public int CalcularDiasRetraso()
         {
             DateTime fechaComparacion = fechaDevolucionReal ?? DateTime.Now;
@@ -146,7 +139,6 @@ namespace SistemaBiblioteca1.Models
             devuelto = true;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -164,7 +156,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaPrestamos.FirstOrDefault(p => p.Id == idBuscado); // null si no existe
+            return listaPrestamos.FirstOrDefault(p => p.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -193,7 +185,6 @@ namespace SistemaBiblioteca1.Models
             listaPrestamos.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -201,7 +192,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             string devolucionTexto = fechaDevolucionReal.HasValue
@@ -212,4 +202,3 @@ namespace SistemaBiblioteca1.Models
         }
     }
 }
-

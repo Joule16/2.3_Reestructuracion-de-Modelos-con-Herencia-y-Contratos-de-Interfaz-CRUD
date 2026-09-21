@@ -11,19 +11,14 @@ namespace SistemaBiblioteca1.Models
 {
     public class Autor : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Autor> listaAutores = new List<Autor>();
 
-        // ---------- Campos ----------
         private string nombre;
         private string apellido;
         private string nacionalidad;
         private DateTime fechaNacimiento;
         private string imagen;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdAutor
         public int IdAutor
         {
             get { return Id; }
@@ -80,14 +75,12 @@ namespace SistemaBiblioteca1.Models
             set { imagen = value; }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Autor() : base()
         {
             nombre = string.Empty;
@@ -95,7 +88,7 @@ namespace SistemaBiblioteca1.Models
             nacionalidad = string.Empty;
             imagen = string.Empty;
             fechaNacimiento = DateTime.Now;
-            EsActivo = false; // igual que antes: un autor vacío nace inactivo
+            EsActivo = false; 
         }
 
         public Autor(int idAutor, string nombre, string apellido, string nacionalidad,
@@ -108,7 +101,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public int CalcularEdad()
         {
             return CalcularEdad(DateTime.Now);
@@ -122,7 +114,6 @@ namespace SistemaBiblioteca1.Models
             return edad;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -140,7 +131,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaAutores.FirstOrDefault(a => a.Id == idBuscado); // null si no existe
+            return listaAutores.FirstOrDefault(a => a.Id == idBuscado); 
         }
 
         public void ActualizarRegistro(object objeto)
@@ -169,7 +160,6 @@ namespace SistemaBiblioteca1.Models
             listaAutores.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -177,7 +167,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Autor #{Id}: {nombre} {apellido} | Nacionalidad: {nacionalidad} | " +

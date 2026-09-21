@@ -12,17 +12,12 @@ namespace SistemaBiblioteca1.Models
 {
     public class Categoria : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Categoria> listaCategorias = new List<Categoria>();
 
-        // ---------- Campos ----------
         private string nombre;
         private string descripcion;
         private bool restringidaMenores;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdCategoria
         public int IdCategoria
         {
             get { return Id; }
@@ -52,20 +47,18 @@ namespace SistemaBiblioteca1.Models
             set { restringidaMenores = value; }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Categoria() : base()
         {
             nombre = string.Empty;
             descripcion = string.Empty;
             restringidaMenores = false;
-            EsActivo = false; // igual que antes: una categoría vacía nace inactiva
+            EsActivo = false;
         }
 
         public Categoria(int idCategoria, string nombre, string descripcion,
@@ -77,7 +70,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public bool PermiteAcceso(int edadUsuario)
         {
             return PermiteAcceso(edadUsuario, 18);
@@ -90,7 +82,6 @@ namespace SistemaBiblioteca1.Models
             return edadUsuario >= edadMinima;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -108,7 +99,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaCategorias.FirstOrDefault(c => c.Id == idBuscado); // null si no existe
+            return listaCategorias.FirstOrDefault(c => c.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -137,7 +128,6 @@ namespace SistemaBiblioteca1.Models
             listaCategorias.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -145,7 +135,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Categoría #{Id}: {nombre} | Restringida: {restringidaMenores} | " +
@@ -153,4 +142,3 @@ namespace SistemaBiblioteca1.Models
         }
     }
 }
-

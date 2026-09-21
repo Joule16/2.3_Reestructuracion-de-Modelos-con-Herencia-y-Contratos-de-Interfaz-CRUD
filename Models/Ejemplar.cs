@@ -5,25 +5,21 @@
 //=============================
 using SistemaBiblioteca1.Models;
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
- 
+
 namespace SistemaBiblioteca1.Models
 {
     public class Ejemplar : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Ejemplar> listaEjemplares = new List<Ejemplar>();
 
-        // ---------- Campos ----------
         private int idLibro;
         private string codigoInventario;
         private string condicion;
         private bool disponible;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdEjemplar
         public int IdEjemplar
         {
             get { return Id; }
@@ -70,21 +66,19 @@ namespace SistemaBiblioteca1.Models
             set { disponible = value; }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Ejemplar() : base()
         {
             idLibro = 0;
             codigoInventario = string.Empty;
             condicion = "Nuevo";
             disponible = true;
-            EsActivo = false; // igual que antes: un ejemplar vacío nace inactivo
+            EsActivo = false;
         }
 
         public Ejemplar(int idEjemplar, int idLibro, string codigoInventario, string condicion,
@@ -97,7 +91,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public double CalcularPorcentajePenalizacion()
         {
             switch (condicion)
@@ -127,7 +120,6 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -145,7 +137,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaEjemplares.FirstOrDefault(e => e.Id == idBuscado); // null si no existe
+            return listaEjemplares.FirstOrDefault(e => e.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -174,7 +166,6 @@ namespace SistemaBiblioteca1.Models
             listaEjemplares.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -182,7 +173,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Ejemplar #{Id} (Libro #{idLibro}) | Código: {codigoInventario} | " +
@@ -190,4 +180,3 @@ namespace SistemaBiblioteca1.Models
         }
     }
 }
-

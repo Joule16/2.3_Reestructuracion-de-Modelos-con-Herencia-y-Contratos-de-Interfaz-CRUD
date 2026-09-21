@@ -5,25 +5,21 @@
 //=============================
 using SistemaBiblioteca1.Models;
 using System;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Pago : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Pago> listaPagos = new List<Pago>();
 
-        // ---------- Campos ----------
         private int idSancion;
         private double monto;
         private DateTime fechaPago;
         private string metodoPago;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdPago
         public int IdPago
         {
             get { return Id; }
@@ -70,21 +66,19 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Pago() : base()
         {
             idSancion = 0;
             monto = 0.0;
             fechaPago = DateTime.Now;
             metodoPago = "Efectivo";
-            EsActivo = false; // igual que antes: un pago vacío nace inactivo
+            EsActivo = false;
         }
 
         public Pago(int idPago, int idSancion, double monto, string metodoPago, bool estado) : base(idPago)
@@ -96,7 +90,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public bool CubreSancion(double montoSancion)
         {
             return CubreSancion(montoSancion, 0.0);
@@ -110,7 +103,6 @@ namespace SistemaBiblioteca1.Models
             return monto >= montoConDescuento;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -128,7 +120,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaPagos.FirstOrDefault(p => p.Id == idBuscado); // null si no existe
+            return listaPagos.FirstOrDefault(p => p.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -157,7 +149,6 @@ namespace SistemaBiblioteca1.Models
             listaPagos.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -165,7 +156,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Pago #{Id} | Sanción #{idSancion} | Monto: ${monto:0.00} | " +
@@ -173,4 +163,3 @@ namespace SistemaBiblioteca1.Models
         }
     }
 }
-

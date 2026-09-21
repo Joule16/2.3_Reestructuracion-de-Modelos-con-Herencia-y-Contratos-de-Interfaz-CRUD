@@ -11,24 +11,18 @@ using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
-    public class Sancion : EntidadBase, IAlmacenamientoCRUD
+    public class Prestamo : EntidadBase, IAlmacenamientoCRUD
     {
-        private static List<Sancion> listaSanciones = new List<Sancion>();
+        private static List<Prestamo> listaPrestamos = new List<Prestamo>();
 
         private int idUsuario;
-        private int idPrestamo;
-        private string motivo;
-        private int diasRetraso;
-        private double porcentajePenalizacionCondicion;
-        private double monto;
-        private DateTime fechaInicio;
-        private DateTime fechaFinDesactivacion;
-        private bool pagada;
+        private int idEjemplar;
+        private DateTime fechaPrestamo;
+        private DateTime fechaLimite;
+        private DateTime? fechaDevolucionReal;
+        private bool devuelto;
 
-        private const double TARIFA_BASE_POR_DIA = 10.0;
-        private const int DIAS_DESACTIVACION_DEFECTO = 15;
-
-        public int IdSancion
+        public int IdPrestamo
         {
             get { return Id; }
             set { Id = value; }
@@ -45,82 +39,55 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        public int IdPrestamo
+        public int IdEjemplar
         {
-            get { return idPrestamo; }
+            get { return idEjemplar; }
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Debe asignarse un préstamo válido.");
-                idPrestamo = value;
+                    throw new ArgumentException("Debe asignarse un ejemplar válido.");
+                idEjemplar = value;
             }
         }
 
-        public string Motivo
+        public DateTime FechaPrestamo
         {
-            get { return motivo; }
+            get { return fechaPrestamo; }
+            set { fechaPrestamo = value; }
+        }
+
+        public DateTime FechaLimite
+        {
+            get { return fechaLimite; }
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentException("El motivo no puede estar vacío.");
-                motivo = value.Trim();
+                if (value.Date < fechaPrestamo.Date)
+                    throw new ArgumentException("La fecha límite no puede ser anterior a la fecha de préstamo.");
+                fechaLimite = value;
             }
         }
 
-        public int DiasRetraso
+        public DateTime? FechaDevolucionReal
         {
-            get { return diasRetraso; }
+            get { return fechaDevolucionReal; }
+            set { fechaDevolucionReal = value; }
+        }
+
+        public bool Devuelto
+        {
+            get { return devuelto; }
             set
             {
-                if (value < 0)
-                    throw new ArgumentException("Los días de retraso no pueden ser negativos.");
-                diasRetraso = value;
+                devuelto = value;
+                if (devuelto && !fechaDevolucionReal.HasValue)
+                {
+                    fechaDevolucionReal = DateTime.Now;
+                }
+                else if (!devuelto)
+                {
+                    fechaDevolucionReal = null;
+                }
             }
-        }
-
-        public double PorcentajePenalizacionCondicion
-        {
-            get { return porcentajePenalizacionCondicion; }
-            set
-            {
-                if (value < 0 || value > 1)
-                    throw new ArgumentException("El porcentaje debe estar entre 0 y 1.");
-                porcentajePenalizacionCondicion = value;
-            }
-        }
-
-        public double Monto
-        {
-            get { return monto; }
-            private set
-            {
-                if (value < 0)
-                    throw new ArgumentException("El monto no puede ser negativo.");
-                monto = value;
-            }
-        }
-
-        public DateTime FechaInicio
-        {
-            get { return fechaInicio; }
-            set { fechaInicio = value; }
-        }
-
-        public DateTime FechaFinDesactivacion
-        {
-            get { return fechaFinDesactivacion; }
-            set
-            {
-                if (value < fechaInicio)
-                    throw new ArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio.");
-                fechaFinDesactivacion = value;
-            }
-        }
-
-        public bool Pagada
-        {
-            get { return pagada; }
-            set { pagada = value; }
         }
 
         public bool Estado
@@ -129,58 +96,47 @@ namespace SistemaBiblioteca1.Models
             set { EsActivo = value; }
         }
 
-        public Sancion() : base()
+        public Prestamo() : base()
         {
             idUsuario = 0;
-            idPrestamo = 0;
-            motivo = string.Empty;
-            diasRetraso = 0;
-            porcentajePenalizacionCondicion = 0.0;
-            monto = 0.0;
-            fechaInicio = DateTime.Now;
-            fechaFinDesactivacion = DateTime.Now.AddDays(DIAS_DESACTIVACION_DEFECTO);
-            pagada = false;
+            idEjemplar = 0;
+            fechaPrestamo = DateTime.Now;
+            fechaLimite = DateTime.Now;
+            fechaDevolucionReal = null;
+            devuelto = false;
             EsActivo = false;
         }
 
-        public Sancion(int idSancion, int idUsuario, int idPrestamo, string motivo,
-                       int diasRetraso, double porcentajePenalizacionCondicion, bool estado) : base(idSancion)
+        public Prestamo(int idPrestamo, int idUsuario, int idEjemplar, DateTime fechaPrestamo,
+                        DateTime fechaLimite, bool estado) : base(idPrestamo)
         {
             IdUsuario = idUsuario;
-            IdPrestamo = idPrestamo;
-            Motivo = motivo;
-            DiasRetraso = diasRetraso;
-            PorcentajePenalizacionCondicion = porcentajePenalizacionCondicion;
-            FechaInicio = DateTime.Now;
-            FechaFinDesactivacion = DateTime.Now.AddDays(DIAS_DESACTIVACION_DEFECTO);
-            Pagada = false;
+            IdEjemplar = idEjemplar;
+            FechaPrestamo = fechaPrestamo;
+            FechaLimite = fechaLimite;
+            fechaDevolucionReal = null;
+            devuelto = false;
             EsActivo = estado;
-            Monto = CalcularMonto();
         }
 
-        public double CalcularMonto()
+        public int CalcularDiasRetraso()
         {
-            double resultado = CalcularMonto(TARIFA_BASE_POR_DIA);
-            Monto = resultado;
-            return resultado;
+            DateTime fechaComparacion = fechaDevolucionReal ?? DateTime.Now;
+            return CalcularDiasRetraso(fechaComparacion);
         }
 
-        public double CalcularMonto(double tarifaPorDia)
+        public int CalcularDiasRetraso(DateTime fechaDevolucion)
         {
-            if (tarifaPorDia < 0)
-                throw new ArgumentException("La tarifa por día no puede ser negativa.");
-            double baseMonto = diasRetraso * tarifaPorDia;
-            double baseCalculoRecargo = (baseMonto > 0) ? baseMonto : tarifaPorDia;
-            double recargo = baseCalculoRecargo * porcentajePenalizacionCondicion;
-
-            double resultado = baseMonto + recargo;
-            Monto = resultado;
-            return resultado;
+            TimeSpan diferencia = fechaDevolucion.Date - fechaLimite.Date;
+            return diferencia.Days > 0 ? diferencia.Days : 0;
         }
 
-        public void RegistrarPago()
+        public void RegistrarDevolucion(DateTime fecha)
         {
-            pagada = true;
+            if (fecha.Date < fechaPrestamo.Date)
+                throw new ArgumentException("La fecha de devolución no puede ser anterior al préstamo.");
+            fechaDevolucionReal = fecha;
+            devuelto = true;
         }
 
         public void InsertarRegistro(object objeto)
@@ -188,19 +144,19 @@ namespace SistemaBiblioteca1.Models
             if (objeto == null)
                 throw new ArgumentNullException(nameof(objeto), "El objeto a insertar no puede ser nulo.");
 
-            if (!(objeto is Sancion sancion))
-                throw new ArgumentException("El objeto a insertar no es de tipo Sancion.");
+            if (!(objeto is Prestamo prestamo))
+                throw new ArgumentException("El objeto a insertar no es de tipo Prestamo.");
 
-            if (listaSanciones.Any(s => s.Id == sancion.Id))
-                throw new InvalidOperationException($"Ya existe una sanción con el id {sancion.Id}.");
+            if (listaPrestamos.Any(p => p.Id == prestamo.Id))
+                throw new InvalidOperationException($"Ya existe un préstamo con el id {prestamo.Id}.");
 
-            listaSanciones.Add(sancion);
+            listaPrestamos.Add(prestamo);
         }
 
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaSanciones.FirstOrDefault(s => s.Id == idBuscado);
+            return listaPrestamos.FirstOrDefault(p => p.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -208,25 +164,25 @@ namespace SistemaBiblioteca1.Models
             if (objeto == null)
                 throw new ArgumentNullException(nameof(objeto), "El objeto a actualizar no puede ser nulo.");
 
-            if (!(objeto is Sancion sancion))
-                throw new ArgumentException("El objeto a actualizar no es de tipo Sancion.");
+            if (!(objeto is Prestamo prestamo))
+                throw new ArgumentException("El objeto a actualizar no es de tipo Prestamo.");
 
-            int indice = listaSanciones.FindIndex(s => s.Id == sancion.Id);
+            int indice = listaPrestamos.FindIndex(p => p.Id == prestamo.Id);
             if (indice == -1)
-                throw new InvalidOperationException($"No existe una sanción con el id {sancion.Id}.");
+                throw new InvalidOperationException($"No existe un préstamo con el id {prestamo.Id}.");
 
-            listaSanciones[indice] = sancion;
+            listaPrestamos[indice] = prestamo;
         }
 
         public void EliminarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
 
-            int indice = listaSanciones.FindIndex(s => s.Id == idBuscado);
+            int indice = listaPrestamos.FindIndex(p => p.Id == idBuscado);
             if (indice == -1)
-                throw new InvalidOperationException($"No existe una sanción con el id {idBuscado}.");
+                throw new InvalidOperationException($"No existe un préstamo con el id {idBuscado}.");
 
-            listaSanciones.RemoveAt(indice);
+            listaPrestamos.RemoveAt(indice);
         }
 
         private static int ConvertirId(string id)
@@ -238,9 +194,11 @@ namespace SistemaBiblioteca1.Models
 
         public override string ToString()
         {
-            return $"Sanción #{Id} | Usuario #{idUsuario} | Motivo: {motivo} | " +
-                   $"Retraso: {diasRetraso} días | Monto: ${monto:0.00} | Pagada: {pagada} | " +
-                   $"Reactiva: {fechaFinDesactivacion:d}";
+            string devolucionTexto = fechaDevolucionReal.HasValue
+                ? fechaDevolucionReal.Value.ToShortDateString()
+                : "Pendiente";
+            return $"Préstamo #{Id} | Usuario #{idUsuario} | Ejemplar #{idEjemplar} | " +
+                   $"Límite: {fechaLimite:d} | Devolución: {devolucionTexto} | Retraso: {CalcularDiasRetraso()} días";
         }
     }
 }

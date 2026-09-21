@@ -5,23 +5,20 @@
 //=============================
 using SistemaBiblioteca1.Models;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Editorial : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Editorial> listaEditoriales = new List<Editorial>();
 
-        // ---------- Campos ----------
         private string nombre;
         private string paisOrigen;
         private double anioFundacion;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdEditorial
         public int IdEditorial
         {
             get { return Id; }
@@ -61,20 +58,18 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Editorial() : base()
         {
             nombre = string.Empty;
             paisOrigen = string.Empty;
             anioFundacion = DateTime.Now.Year;
-            EsActivo = false; // igual que antes: una editorial vacía nace inactiva
+            EsActivo = false;
         }
 
         public Editorial(int idEditorial, string nombre, string paisOrigen,
@@ -86,7 +81,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public double CalcularAntiguedad()
         {
             return CalcularAntiguedad(DateTime.Now.Year);
@@ -99,7 +93,6 @@ namespace SistemaBiblioteca1.Models
             return anioReferencia - anioFundacion;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -117,7 +110,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaEditoriales.FirstOrDefault(e => e.Id == idBuscado); // null si no existe
+            return listaEditoriales.FirstOrDefault(e => e.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -146,7 +139,6 @@ namespace SistemaBiblioteca1.Models
             listaEditoriales.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -154,7 +146,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Editorial #{Id}: {nombre} | País: {paisOrigen} | " +

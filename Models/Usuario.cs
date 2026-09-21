@@ -3,18 +3,18 @@
 //Nuñes Martinez Marco Antonio 
 //Equipo 2 
 //============================= 
+using SistemaBiblioteca1.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Usuario : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Usuario> listaUsuarios = new List<Usuario>();
 
-        // ---------- Campos ----------
         private string nombre;
         private string apellido;
         private string email;
@@ -25,9 +25,6 @@ namespace SistemaBiblioteca1.Models
 
         private const int LIMITE_SANCIONES_BANEO = 5;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdUsuario
         public int IdUsuario
         {
             get { return Id; }
@@ -111,14 +108,12 @@ namespace SistemaBiblioteca1.Models
             set { estaBaneado = value; }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Usuario() : base()
         {
             nombre = string.Empty;
@@ -128,11 +123,11 @@ namespace SistemaBiblioteca1.Models
             idUniversitario = string.Empty;
             contadorSanciones = 0;
             estaBaneado = false;
-            EsActivo = false; // igual que antes: un usuario vacío nace inactivo
+            EsActivo = false;
         }
 
         public Usuario(int idUsuario, string nombre, string apellido, string email,
-                        string telefono, string idUniversitario, bool estado) : base(idUsuario)
+                       string telefono, string idUniversitario, bool estado) : base(idUsuario)
         {
             Nombre = nombre;
             Apellido = apellido;
@@ -144,7 +139,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public void RegistrarSancion()
         {
             RegistrarSancion(1, LIMITE_SANCIONES_BANEO);
@@ -174,7 +168,6 @@ namespace SistemaBiblioteca1.Models
             return PuedeSolicitarPrestamo() && prestamosActivos < limitePrestamos;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -192,7 +185,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaUsuarios.FirstOrDefault(u => u.Id == idBuscado); // null si no existe
+            return listaUsuarios.FirstOrDefault(u => u.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -221,7 +214,6 @@ namespace SistemaBiblioteca1.Models
             listaUsuarios.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -229,7 +221,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Usuario #{Id}: {nombre} {apellido} | ID Universitario: {idUniversitario} | " +

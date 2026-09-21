@@ -5,16 +5,15 @@
 //=============================
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SistemaBiblioteca1.Models
 {
     public class Libro : EntidadBase, IAlmacenamientoCRUD
     {
-        // ---------- Almacenamiento en memoria ----------
         private static List<Libro> listaLibros = new List<Libro>();
 
-        // ---------- Campos ----------
         private string titulo;
         private string isbn;
         private int idAutor;
@@ -22,9 +21,6 @@ namespace SistemaBiblioteca1.Models
         private int idEditorial;
         private int anioPublicacion;
 
-        // ---------- Propiedades ----------
-
-        // Puente hacia EntidadBase.Id para no romper el código que ya usa IdLibro
         public int IdLibro
         {
             get { return Id; }
@@ -97,14 +93,12 @@ namespace SistemaBiblioteca1.Models
             }
         }
 
-        // Puente hacia EntidadBase.EsActivo para no romper el código que ya usa Estado
         public bool Estado
         {
             get { return EsActivo; }
             set { EsActivo = value; }
         }
 
-        // ---------- Constructores ----------
         public Libro() : base()
         {
             titulo = string.Empty;
@@ -113,7 +107,7 @@ namespace SistemaBiblioteca1.Models
             idCategoria = 0;
             idEditorial = 0;
             anioPublicacion = DateTime.Now.Year;
-            EsActivo = false; // igual que antes: un libro vacío nace inactivo
+            EsActivo = false;
         }
 
         public Libro(int idLibro, string titulo, string isbn, int idAutor, int idCategoria,
@@ -128,7 +122,6 @@ namespace SistemaBiblioteca1.Models
             EsActivo = estado;
         }
 
-        // ---------- Lógica de negocio ----------
         public int CalcularAntiguedad()
         {
             return CalcularAntiguedad(DateTime.Now.Year);
@@ -141,7 +134,6 @@ namespace SistemaBiblioteca1.Models
             return anioReferencia - anioPublicacion;
         }
 
-        // ---------- Implementación de IAlmacenamientoCRUD ----------
         public void InsertarRegistro(object objeto)
         {
             if (objeto == null)
@@ -159,7 +151,7 @@ namespace SistemaBiblioteca1.Models
         public object ConsultarRegistro(string id)
         {
             int idBuscado = ConvertirId(id);
-            return listaLibros.FirstOrDefault(l => l.Id == idBuscado); // null si no existe
+            return listaLibros.FirstOrDefault(l => l.Id == idBuscado);
         }
 
         public void ActualizarRegistro(object objeto)
@@ -188,7 +180,6 @@ namespace SistemaBiblioteca1.Models
             listaLibros.RemoveAt(indice);
         }
 
-        // Convierte el id (string) de la interfaz al int de EntidadBase
         private static int ConvertirId(string id)
         {
             if (!int.TryParse(id, out int resultado) || resultado < 0)
@@ -196,7 +187,6 @@ namespace SistemaBiblioteca1.Models
             return resultado;
         }
 
-        // ---------- ToString ----------
         public override string ToString()
         {
             return $"Libro #{Id}: {titulo} | ISBN: {isbn} | Año: {anioPublicacion} | " +
